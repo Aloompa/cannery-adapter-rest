@@ -11,7 +11,7 @@ const RestAdapter = require('cannery-adapter-rest');
 class MyModel extends Cannery.Model {
 
     getAdapter () {
-        return new RestAdapter(this);
+        return new RestAdapter();
     }
 
     getFields () {
