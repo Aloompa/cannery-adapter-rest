@@ -15,8 +15,6 @@ describe('destroy()', () => {
 
         adapter.destroy(car).then((data) => {
             done();
-        }).catch((e) => {
-            console.log(e);
         });
     });
 
