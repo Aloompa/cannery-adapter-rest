@@ -2,12 +2,24 @@
 
 const ajax = require('then-request');
 const adapterOptions = Symbol();
-const formatFetchResponse = Symbol();
 
 class RestAdapter {
 
     constructor (options = {}) {
         this[adapterOptions] = options;
+    }
+
+    buildNestedUrl (url, child) {
+        const parent = child.getParent();
+
+        url = `${child.getName()}/${child.id}/${url}`;
+
+        if (parent) {
+            return this.buildNestedUrl(url, parent);
+
+        } else {
+            return url;
+        }
     }
 
     create (model, options) {
@@ -43,7 +55,11 @@ class RestAdapter {
     }
 
     fetchWithin (Model, parent, options) {
-        throw new Error('Implement this');
+        const url = this.buildNestedUrl(new Model().getNameSingular(), parent);
+        const requestOptions = this.createOptions(options);
+
+        return ajax('GET', url, requestOptions)
+            .then(this.formatFetchResponse.bind(this));
     }
 
     findAll (Model, options) {
@@ -56,14 +72,7 @@ class RestAdapter {
 
     findAllWithin (Model, parent, options) {
         const requestOptions = this.createOptions(options);
-
-        let child = new Model();
-        let url = new Model().getName();
-
-        while (child.getParent()) {
-            child = child.getParent();
-            url = `${child.getName()}/${child.id}/${url}`;
-        }
+        const url = this.buildNestedUrl(new Model().getName(), parent);
 
         return ajax('GET', this.getUrl(url), requestOptions)
             .then(this.formatFindAllResponse.bind(this));
@@ -102,9 +111,7 @@ class RestAdapter {
 
         try {
             return JSON.parse(body);
-        } catch (e) {
-            return;
-        }
+        } catch (e) {}
 
     }
 

@@ -2,26 +2,23 @@
 
 const responses = {
     GET: {
-        'api/cars/1': {
+        'api/cars/1/part': {
             body: {
                 id: 1,
-                make: 'Jeep',
-                model: 'Grand Cherokee'
+                name: 'Engine'
             }
         },
-        'cars/1': {
+        'cars/1/part': {
             body: {
                 id: 1,
-                make: 'Ford',
-                model: 'Tauras'
+                name: 'Steering Wheel'
             }
         },
-        'cars/2': {
+        'cars/2/part': {
             body: {
-                car: {
+                part: {
                     id: 2,
-                    make: 'Honda',
-                    model: 'Accord'
+                    name: 'Engine'
                 }
             }
         }

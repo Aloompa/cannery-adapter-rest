@@ -59,4 +59,35 @@ describe('findAllWithin()', () => {
         });
     });
 
+    it('Should allow us to traverse more than one parent', (done) => {
+        const adapter = new RestAdapter();
+        const car = new Car(1);
+        const part = new Part(2);
+
+        Part.prototype.getParent = () => {
+            return car;
+        };
+
+        class PartMaker {
+
+            constructor (id) {
+                this.id = id;
+            }
+
+            getName () {
+                return 'part_makers';
+            }
+
+            getParent () {
+                return part;
+            }
+
+        }
+
+        adapter.findAllWithin(PartMaker, part).then((data) => {
+            assert.equal(data[0].name, 'Big John');
+            done();
+        });
+    });
+
 });

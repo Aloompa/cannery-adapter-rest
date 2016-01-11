@@ -10,6 +10,10 @@ class Part {
         return 'parts';
     }
 
+    getNameSingular () {
+        return 'part';
+    }
+
 }
 
 module.exports = Part;

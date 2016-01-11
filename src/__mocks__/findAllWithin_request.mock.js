@@ -16,6 +16,10 @@ const responses = {
         'cars/1/parts?type=chevy': [{
             id: 3,
             name: 'Radio'
+        }],
+        'cars/1/parts/2/part_makers': [{
+            id: 3,
+            name: 'Big John'
         }]
     }
 };

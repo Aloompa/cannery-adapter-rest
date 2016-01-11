@@ -7,9 +7,7 @@ const requests = {
         },
 
         'api/cars/2': (options) => {
-            return {
-                messsage: 'We Deleted the Car'
-            };
+            return 'We Deleted the Car';
         }
     }
 };
