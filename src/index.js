@@ -26,7 +26,12 @@ class RestAdapter {
     }
 
     destroy (model, options) {
-        throw new Error('Implement this');
+        const url = this.getFetchUrl(model.getName(), model.id);
+        const requestOptions = this.createOptions(options);
+        requestOptions.body = model.toJSON();
+
+        return ajax('DELETE', url, requestOptions)
+            .then(this.parseResponse.bind(this));
     }
 
     fetch (model, options) {
@@ -65,14 +70,14 @@ class RestAdapter {
     }
 
     formatFetchResponse (response) {
-        const body = JSON.parse(response.getBody());
+        const body = this.parseResponse(response);
         const envelope = this.getOptions().envelope;
 
         return (envelope) ? body[envelope] : body;
     }
 
     formatFindAllResponse (response) {
-        const body = JSON.parse(response.getBody());
+        const body = this.parseResponse(response);
         const envelope = this.getOptions().arrayEnvelope;
 
         return (envelope) ? body[envelope] : body;
@@ -90,6 +95,17 @@ class RestAdapter {
 
     getOptions () {
         return this[adapterOptions];
+    }
+
+    parseResponse (response) {
+        const body = response.getBody();
+
+        try {
+            return JSON.parse(body);
+        } catch (e) {
+            return;
+        }
+
     }
 
     update (model, options) {
