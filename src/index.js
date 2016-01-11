@@ -93,7 +93,12 @@ class RestAdapter {
     }
 
     update (model, options) {
-        throw new Error('Implement this');
+        const url = this.getFetchUrl(model.getName(), model.id);
+        const requestOptions = this.createOptions(options);
+        requestOptions.body = model.toJSON();
+
+        return ajax('PUT', url, requestOptions)
+            .then(this.formatFetchResponse.bind(this));
     }
 
 }

@@ -1,6 +1,6 @@
 const requests = {
-    POST: {
-        cars: (options) => {
+    PUT: {
+        'cars/1': (options) => {
             if (options.envelope) {
                 return {
                     [ options.envelope ]: options.body
@@ -10,7 +10,7 @@ const requests = {
             return options.body;
         },
 
-        'api/cars': (options) => {
+        'api/cars/2': (options) => {
             return options.body;
         }
     }
