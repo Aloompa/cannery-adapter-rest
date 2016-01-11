@@ -11,13 +11,18 @@ class RestAdapter {
     }
 
     create (model, options) {
-        throw new Error('Implement this');
+        const url = this.getUrl(model.getName());
+        const requestOptions = this.createOptions(options);
+        requestOptions.body = model.toJSON();
+
+        return ajax('POST', url, requestOptions)
+            .then(this.formatFetchResponse.bind(this));
     }
 
     createOptions (options = {}) {
         options.headers = Object.assign({}, this.getOptions().headers, options.headers);
 
-        return options;
+        return Object.assign({}, this[adapterOptions], options);
     }
 
     destroy (model, options) {

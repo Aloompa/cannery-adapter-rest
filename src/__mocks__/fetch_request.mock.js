@@ -1,7 +1,7 @@
 'use strict';
 
 const responses = {
-    'GET': {
+    GET: {
         'api/cars/1': {
             body: {
                 id: 1,

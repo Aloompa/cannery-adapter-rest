@@ -1,7 +1,7 @@
 'use strict';
 
 const responses = {
-    'GET': {
+    GET: {
         'cars/1/parts': [{
             id: 1,
             name: 'Engine'
@@ -18,7 +18,7 @@ const responses = {
             name: 'Radio'
         }]
     }
-}
+};
 
 module.exports = (method, url, options) => {
     return new Promise((resolve, reject) => {

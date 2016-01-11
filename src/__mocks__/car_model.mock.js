@@ -14,6 +14,14 @@ class Car {
         return null;
     }
 
+    toJSON () {
+        return {
+            id: this.id,
+            make: 'Mazda',
+            model: 'Mazda3'
+        };
+    }
+
 }
 
 module.exports = Car;
