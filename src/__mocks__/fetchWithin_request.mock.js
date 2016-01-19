@@ -2,9 +2,9 @@
 
 const responses = {
     GET: {
-        'api/cars/1/part': {
+        'api/cars/3/part': {
             body: {
-                id: 1,
+                id: 3,
                 name: 'Engine'
             }
         },

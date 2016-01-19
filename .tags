@@ -16,3 +16,5 @@ getOptions	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/index
 getResponseBody	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/index.js	/^    getResponseBody (response) {$/;"	function	line:120
 parseResponse	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/index.js	/^    parseResponse (response) {$/;"	function	line:136
 update	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/index.js	/^    update (model, options) {$/;"	function	line:145
+const.GET	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/__mocks__/findAllWithin_request.mock.js	/^const responses = {$/;"	property	line:3
+const.GET	/Users/tysoncadenhead/Sites/opensource/cannery-adapter-rest/src/__mocks__/fetchWithin_request.mock.js	/^const responses = {$/;"	property	line:3

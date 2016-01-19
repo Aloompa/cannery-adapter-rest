@@ -52,13 +52,13 @@ describe('fetchWithin()', () => {
     });
 
     it('Should allow us to specify a urlRoot', (done) => {
-        const car = new Car(1);
+        const car = new Car(3);
         const adapter = new RestAdapter({
             urlRoot: 'api/'
         });
 
         adapter.fetchWithin(new Part(), car).then((data) => {
-            assert.equal(data.name, 'Steering Wheel');
+            assert.equal(data.name, 'Engine');
             done();
         });
     });

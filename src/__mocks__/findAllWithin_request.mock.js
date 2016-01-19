@@ -25,6 +25,7 @@ const responses = {
 };
 
 module.exports = (method, url, options) => {
+
     return new Promise((resolve, reject) => {
         if (options.throwError) {
             return reject({
