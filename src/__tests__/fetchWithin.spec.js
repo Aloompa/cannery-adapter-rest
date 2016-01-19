@@ -18,7 +18,7 @@ describe('fetchWithin()', () => {
             return car;
         };
 
-        adapter.fetchWithin(Part, car).then((data) => {
+        adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Steering Wheel');
             done();
         });
@@ -35,7 +35,7 @@ describe('fetchWithin()', () => {
             return car;
         };
 
-        adapter.fetchWithin(Part, car).then((data) => {
+        adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Engine');
             done();
         });
@@ -45,7 +45,7 @@ describe('fetchWithin()', () => {
         const car = new Car(2000);
         const adapter = new RestAdapter();
 
-        adapter.fetchWithin(Part, car).catch((data) => {
+        adapter.fetchWithin(new Part(), car).catch((data) => {
             assert.equal(data.statusCode, 404);
             done();
         });
@@ -57,7 +57,7 @@ describe('fetchWithin()', () => {
             urlRoot: 'api/'
         });
 
-        adapter.fetchWithin(Part, car).then((data) => {
+        adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Steering Wheel');
             done();
         });

@@ -65,8 +65,8 @@ class RestAdapter {
             .then(this.formatFetchResponse.bind(this));
     }
 
-    fetchWithin (Model, parent, options) {
-        const url = this.buildNestedUrl(new Model().getNameSingular(), parent);
+    fetchWithin (model, parent, options) {
+        const url = this.buildNestedUrl(model.getNameSingular(), parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', url, requestOptions)
