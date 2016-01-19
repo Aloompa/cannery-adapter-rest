@@ -69,7 +69,7 @@ class RestAdapter {
         const url = this.buildNestedUrl(model.getNameSingular(), parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
-        return ajax('GET', url, requestOptions)
+        return ajax('GET', this.getUrl(url), requestOptions)
             .then(this.formatFetchResponse.bind(this));
     }
 
