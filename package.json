@@ -1,6 +1,6 @@
 {
   "name": "cannery-adapter-rest",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The Cannery REST adapter",
   "main": "lib",
   "scripts": {
