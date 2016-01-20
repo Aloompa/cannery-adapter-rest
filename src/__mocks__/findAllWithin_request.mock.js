@@ -2,6 +2,9 @@
 
 const responses = {
     GET: {
+        'foo/bar/baz': [{
+            id: 100
+        }],
         'cars/1/parts': [{
             id: 1,
             name: 'Engine'

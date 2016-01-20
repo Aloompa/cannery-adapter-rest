@@ -2,6 +2,12 @@
 
 const responses = {
     GET: {
+        'foo/bar/baz': {
+            body: {
+                id: 1,
+                name: 'Foo'
+            }
+        },
         'api/cars/3/part': {
             body: {
                 id: 3,

@@ -9,6 +9,20 @@ const RestAdapter = proxyquire('../index', {
 
 describe('fetch()', () => {
 
+    it('Should allow us to define a custom url path', (done) => {
+        const car = new Car(1);
+        const adapter = new RestAdapter();
+
+        adapter.fetch(car, {
+            getPath: () => {
+                return 'foo/bar/baz';
+            }
+        }).then((data) => {
+            assert.equal(data.make, 'Foo');
+            done();
+        });
+    });
+
     it('Should respond with an object of data', (done) => {
         const car = new Car(1);
         const adapter = new RestAdapter();
