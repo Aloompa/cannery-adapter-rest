@@ -10,6 +10,24 @@ const RestAdapter = proxyquire('../index', {
 
 describe('fetchWithin()', () => {
 
+    it('Should let us define our own url path', (done) => {
+        const adapter = new RestAdapter();
+        const car = new Car(1);
+
+        Part.prototype.getParent = () => {
+            return car;
+        };
+
+        adapter.fetchWithin(new Part(), car, {
+            getPath: () => {
+                return 'foo/bar/baz';
+            }
+        }).then((data) => {
+            assert.equal(data.name, 'Foo');
+            done();
+        });
+    });
+
     it('Should respond with an object of data', (done) => {
         const adapter = new RestAdapter();
         const car = new Car(1);

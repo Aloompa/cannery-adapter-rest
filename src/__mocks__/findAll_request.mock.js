@@ -2,6 +2,9 @@
 
 const responses = {
     GET: {
+        'foo/bar/baz': [{
+            id: 100
+        }],
         cars: [{
             id: 1,
             make: 'Ford',
