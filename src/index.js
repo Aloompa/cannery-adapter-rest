@@ -58,7 +58,7 @@ class RestAdapter {
     }
 
     fetch (model, options = {}) {
-        const url = (options.getPath) ? options.getPath() : this.getFetchUrl(model.getName(), model.id);
+        const url = (options.getPath) ? options.getPath(model, options) : this.getFetchUrl(model.getName(), model.id);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', url, requestOptions)
@@ -66,7 +66,7 @@ class RestAdapter {
     }
 
     fetchWithin (model, parent, options = {}) {
-        const url = (options.getPath) ? options.getPath() : this.buildNestedUrl(model.getNameSingular(), parent);
+        const url = (options.getPath) ? options.getPath(model, parent, options) : this.buildNestedUrl(model.getNameSingular(), parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', this.getUrl(url), requestOptions)
@@ -74,7 +74,7 @@ class RestAdapter {
     }
 
     findAll (Model, options = {}) {
-        const url = (options.getPath) ? options.getPath() : this.getUrl(new Model().getName());
+        const url = (options.getPath) ? options.getPath(Model, options) : this.getUrl(new Model().getName());
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', url, requestOptions)
@@ -82,7 +82,7 @@ class RestAdapter {
     }
 
     findAllWithin (Model, parent, options = {}) {
-        const url = (options.getPath) ? options.getPath() : this.buildNestedUrl(new Model().getName(), parent);
+        const url = (options.getPath) ? options.getPath(Model, parent, options) : this.buildNestedUrl(new Model().getName(), parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', this.getUrl(url), requestOptions)
