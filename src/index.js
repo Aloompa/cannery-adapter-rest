@@ -3,6 +3,8 @@
 const ajax = require('then-request');
 const adapterOptions = Symbol();
 
+let endpointState = {};
+let endpointResolver = {};
 let storage = global.localStorage || {};
 
 class RestAdapter {
@@ -61,16 +63,40 @@ class RestAdapter {
         const url = (options.getPath) ? options.getPath(model, options) : this.getFetchUrl(model.getName(), model.id);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
-        return ajax('GET', url, requestOptions)
-            .then(this.formatFetchResponse.bind(this));
+        if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
+            return endpointResolver[url];
+        }
+
+        endpointState[url] = 'fetching';
+
+        endpointResolver[url] = ajax('GET', url, requestOptions)
+            .then(this.formatFetchResponse.bind(this))
+            .then((response) => {
+                endpointState[url] = 'fetched';
+                return response;
+            });
+
+        return endpointResolver[url];
     }
 
     fetchWithin (model, parent, options = {}) {
-        const url = (options.getPath) ? options.getPath(model, parent, options) : this.buildNestedUrl(model.getNameSingular(), parent);
+        const url = (options.getPath) ? options.getPath(model, parent, options) : this.buildNestedUrl(model.getName(), parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
-        return ajax('GET', this.getUrl(url), requestOptions)
-            .then(this.formatFetchResponse.bind(this));
+        if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
+            return endpointResolver[url];
+        }
+
+        endpointState[url] = 'fetching';
+
+        endpointResolver[url] = ajax('GET', this.getUrl(url), requestOptions)
+            .then(this.formatFetchResponse.bind(this))
+            .then((response) => {
+                endpointState[url] = 'fetched';
+                return response;
+            });
+
+        return endpointResolver[url];
     }
 
     findAll (Model, options = {}) {
@@ -142,8 +168,8 @@ class RestAdapter {
 
     }
 
-    update (model, options) {
-        const url = this.getFetchUrl(model.getName(), model.id);
+    update (model, options = {}) {
+        const url = (options.getPath) ? options.getPath(model, options) : this.getFetchUrl(model.getName(), model.id);
         const requestOptions = this.createOptions(options);
         requestOptions.body = model.toJSON();
 
