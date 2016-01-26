@@ -67,38 +67,4 @@ describe('fetch()', () => {
         });
     });
 
-    it('Should pass headers included in the adapter config', (done) => {
-        const car = new Car(1);
-        const adapter = new RestAdapter({
-            headers: {
-                everything: 'awesome'
-            }
-        });
-
-        adapter.formatFetchResponse = (response) => {
-            assert.equal(response.headers.everything, 'awesome');
-            done();
-        };
-
-        adapter.fetch(car);
-
-    });
-
-    it('Should pass headers included in the request options', (done) => {
-        const car = new Car(1);
-        const adapter = new RestAdapter();
-
-        adapter.formatFetchResponse = (response) => {
-            assert.equal(response.headers.everything, 'awesome');
-            done();
-        };
-
-        adapter.fetch(car, {
-            headers: {
-                everything: 'awesome'
-            }
-        });
-
-    });
-
 });

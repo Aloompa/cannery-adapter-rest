@@ -9,7 +9,8 @@ let storage = global.localStorage || {};
 
 class RestAdapter {
 
-    constructor (options = {}) {
+    constructor (options = {}, routes = {}) {
+        this.routes = routes;
         this[adapterOptions] = options;
     }
 
@@ -27,16 +28,16 @@ class RestAdapter {
     }
 
     create (model, options) {
-        const url = this.getUrl(model.getName());
+        const url = this.getSingleFetchUrl(model);
         const requestOptions = this.createOptions(options);
-        requestOptions.body = model.toJSON();
+        requestOptions.body = this.getBody(model);
 
         return ajax('POST', url, requestOptions)
             .then(this.formatFetchResponse.bind(this));
     }
 
     createOptions (options = {}) {
-        options.headers = Object.assign({}, this.getOptions().headers, options.headers);
+        options.headers = Object.assign({}, this[adapterOptions].headers, options.headers);
 
         return Object.assign({}, this[adapterOptions], options);
     }
@@ -51,7 +52,7 @@ class RestAdapter {
     }
 
     destroy (model, options) {
-        const url = this.getFetchUrl(model.getName(), model.id);
+        const url = this.getSingleFetchUrl(model);
         const requestOptions = this.createOptions(options);
         requestOptions.body = model.toJSON();
 
@@ -129,6 +130,10 @@ class RestAdapter {
         return (envelope) ? body[envelope] : body;
     }
 
+    getBody (model) {
+        return JSON.stringify(model.toJSON());
+    }
+
     getUrl (url) {
         const { urlRoot } = this.getOptions();
 
@@ -136,7 +141,17 @@ class RestAdapter {
     }
 
     getFetchUrl (url, id) {
-        return `${this.getUrl(url)}/${id}`;
+        if (id) {
+            return `${this.getUrl(url)}/${id}`;
+        }
+
+        return this.getUrl(url);
+    }
+
+    getSingleFetchUrl (model) {
+        const parent = model.getParent();
+        const parentUrl = (parent) ? `${parent.getName()}/${parent.id}/` : '';
+        return this.getFetchUrl(parentUrl + model.getName(), model.id);
     }
 
     getOptions () {
@@ -169,9 +184,9 @@ class RestAdapter {
     }
 
     update (model, options = {}) {
-        const url = (options.getPath) ? options.getPath(model, options) : this.getFetchUrl(model.getName(), model.id);
+        const url = this.getSingleFetchUrl(model);
         const requestOptions = this.createOptions(options);
-        requestOptions.body = model.toJSON();
+        requestOptions.body = this.getBody(model);
 
         return ajax('PUT', url, requestOptions)
             .then(this.formatFetchResponse.bind(this));

@@ -3,15 +3,15 @@ const requests = {
         'cars/1': (options) => {
             if (options.envelope) {
                 return {
-                    [ options.envelope ]: options.body
+                    [ options.envelope ]: JSON.parse(options.body)
                 };
             }
 
-            return options.body;
+            return JSON.parse(options.body);
         },
 
         'api/cars/2': (options) => {
-            return options.body;
+            return JSON.parse(options.body);
         }
     }
 };

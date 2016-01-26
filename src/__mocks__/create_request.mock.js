@@ -3,15 +3,21 @@ const requests = {
         cars: (options) => {
             if (options.envelope) {
                 return {
-                    [ options.envelope ]: options.body
+                    [ options.envelope ]: {
+                        id: 2
+                    }
                 };
             }
 
-            return options.body;
+            return {
+                id: 1
+            };
         },
 
         'api/cars': (options) => {
-            return options.body;
+            return {
+                id: 3
+            };
         }
     }
 };
