@@ -17,7 +17,7 @@ describe('update()', () => {
             }
         });
 
-        adapter.update(car).then((data) => {
+        adapter.update(car, {}).then((data) => {
             assert.equal(data.id, 5000);
             done();
         });

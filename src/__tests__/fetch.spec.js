@@ -27,7 +27,7 @@ describe('fetch()', () => {
         const car = new Car(1);
         const adapter = new RestAdapter();
 
-        adapter.fetch(car).then((data) => {
+        adapter.fetch(car, {}).then((data) => {
             assert.equal(data.make, 'Ford');
             done();
         });

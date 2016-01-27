@@ -63,7 +63,7 @@ describe('fetchWithin()', () => {
         const car = new Car(2000);
         const adapter = new RestAdapter();
 
-        adapter.fetchWithin(new Part(), car).catch((data) => {
+        adapter.fetchWithin(new Part(), car, {}).catch((data) => {
             assert.equal(data.statusCode, 404);
             done();
         });
@@ -77,6 +77,18 @@ describe('fetchWithin()', () => {
 
         adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Engine');
+            done();
+        });
+    });
+
+    it('Should not make 2 requests if for the same endpoint at the same time', (done) => {
+        const car = new Car(3);
+        const adapter = new RestAdapter({
+            urlRoot: 'api/'
+        });
+
+        adapter.fetchWithin(new Part(), car);
+        adapter.fetchWithin(new Part(), car).then(() => {
             done();
         });
     });

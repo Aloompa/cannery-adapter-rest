@@ -108,4 +108,71 @@ describe('utility', () => {
         });
 
     });
+
+    describe('getResponseBody()', () => {
+        const adapter = new RestAdapter({});
+
+        adapter.getResponseBody({
+            url: 'http://url.com',
+            statusCode: 200,
+            getBody: () => {
+                return {
+                    id: 4567
+                };
+            },
+
+            headers: {
+                etag: 'ETAG1'
+            }
+        });
+
+        const nextResponse = adapter.getResponseBody({
+            url: 'http://url.com',
+            statusCode: 304
+        });
+
+        assert.equal(nextResponse.id, 4567);
+    });
+
+    it('Should get the parent for getSingleFetchUrl()', () => {
+
+        const adapter = new RestAdapter({});
+
+        class Jedi {
+
+            constructor (id) {
+                this.id = id;
+            }
+
+            getName () {
+                return 'jedis';
+            }
+
+        }
+
+        const yoda = new Jedi(1);
+
+        class Lightsaber {
+
+            constructor (id) {
+                this.id = id;
+            }
+
+            getParent () {
+                return yoda;
+            }
+
+            getName () {
+                return 'lightsabers';
+            }
+
+        }
+
+        const lightsaber = new Lightsaber(2);
+
+        const url = adapter.getSingleFetchUrl(lightsaber);
+
+        assert.equal(url, 'jedis/1/lightsabers/2');
+
+    });
 });

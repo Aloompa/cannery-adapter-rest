@@ -12,7 +12,7 @@ describe('destroy()', () => {
     it('Should allow us to override the route', (done) => {
         const car = new Car(1);
         const adapter = new RestAdapter(car, {
-            'Car': 'foo/bar/baz'
+            Car: 'foo/bar/baz'
         });
 
         adapter.destroy(car).then((data) => {
