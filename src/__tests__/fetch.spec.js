@@ -11,13 +11,13 @@ describe('fetch()', () => {
 
     it('Should allow us to define a custom url path', (done) => {
         const car = new Car(1);
-        const adapter = new RestAdapter();
-
-        adapter.fetch(car, {
-            getPath: () => {
-                return 'foo/bar/baz';
+        const adapter = new RestAdapter(car, {
+            Car: {
+                fetch: 'foo/bar/baz'
             }
-        }).then((data) => {
+        });
+
+        adapter.fetch(car).then((data) => {
             assert.equal(data.make, 'Foo');
             done();
         });

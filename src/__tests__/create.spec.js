@@ -9,6 +9,20 @@ const RestAdapter = proxyquire('../index', {
 
 describe('create()', () => {
 
+    it('Should allow us to override the route', (done) => {
+        const car = new Car(1);
+        const adapter = new RestAdapter(car, {
+            Car: {
+                create: 'foo/bar/baz'
+            }
+        });
+
+        adapter.create(car).then((data) => {
+            assert.equal(data.id, 5000);
+            done();
+        });
+    });
+
     it('Should respond with an object of data', (done) => {
         const car = new Car();
         const adapter = new RestAdapter();

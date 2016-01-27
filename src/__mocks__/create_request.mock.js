@@ -18,6 +18,12 @@ const requests = {
             return {
                 id: 3
             };
+        },
+
+        'foo/bar/baz': () => {
+            return {
+                id: 5000
+            };
         }
     }
 };
