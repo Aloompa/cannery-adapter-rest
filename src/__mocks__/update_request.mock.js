@@ -12,6 +12,12 @@ const requests = {
 
         'api/cars/2': (options) => {
             return JSON.parse(options.body);
+        },
+
+        'foo/bar/baz': () => {
+            return {
+                id: 5000
+            };
         }
     }
 };

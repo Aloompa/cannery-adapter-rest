@@ -8,6 +8,12 @@ const requests = {
 
         'api/cars/2': (options) => {
             return 'We Deleted the Car';
+        },
+
+        'foo/bar/baz': () => {
+            return {
+                message: 'Yay'
+            };
         }
     }
 };
