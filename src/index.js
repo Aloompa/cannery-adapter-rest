@@ -66,7 +66,7 @@ class RestAdapter {
     }
 
     create (model, options) {
-        const url = this.getOverrideRoute('create', model) || this.getSingleFetchUrl(model);
+        const url = this.getCreateRoute(model);
         const requestOptions = this.createOptions(options);
         requestOptions.body = this.getBody(model);
 
@@ -90,7 +90,7 @@ class RestAdapter {
     }
 
     destroy (model, options) {
-        const url = this.getSingleFetchUrl(model);
+        const url = this.getDestroyRoute(model);
         const requestOptions = this.createOptions(options);
         requestOptions.body = model.toJSON();
 
@@ -99,7 +99,7 @@ class RestAdapter {
     }
 
     fetch (model, options = {}) {
-        const url = this.getOverrideRoute('fetch', model) || this.getFetchUrl(model.getName(), model.id);
+        const url = this.getFetchRoute(model);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
@@ -119,7 +119,7 @@ class RestAdapter {
     }
 
     fetchWithin (model, parent, options = {}) {
-        const url = this.getOverrideRoute('fetch', model) || this.buildNestedUrl(model.getName(), parent);
+        const url = this.getFetchWithinRoute(model, parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
@@ -139,7 +139,7 @@ class RestAdapter {
     }
 
     findAll (Model, options = {}) {
-        const url = this.getOverrideRoute('findAll', new Model()) || this.getUrl(new Model().getName());
+        const url = this.getFindAllRoute(Model);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', url, requestOptions)
@@ -147,12 +147,7 @@ class RestAdapter {
     }
 
     findAllWithin (Model, parent, options = {}) {
-        const overrideModel = new Model();
-        overrideModel.getParent = () => {
-            return parent;
-        };
-
-        const url = this.getOverrideRoute('findAll', overrideModel) || this.buildNestedUrl(new Model().getName(), parent);
+        const url = this.getFindAllWithinRoute(Model, parent);
         const requestOptions = this.createOptionsWithEtags(url, options);
 
         return ajax('GET', this.getUrl(url), requestOptions)
@@ -175,6 +170,39 @@ class RestAdapter {
 
     getBody (model) {
         return JSON.stringify(model.toJSON());
+    }
+
+    getCreateRoute (model) {
+        return this.getOverrideRoute('create', model) || this.getSingleFetchUrl(model);
+    }
+
+    getDestroyRoute (model) {
+        return this.getOverrideRoute('destroy', model) || this.getSingleFetchUrl(model);
+    }
+
+    getFetchRoute (model) {
+        return this.getOverrideRoute('fetch', model) || this.getFetchUrl(model.getName(), model.id);
+    }
+
+    getFetchWithinRoute (model, parent) {
+        return this.getOverrideRoute('fetch', model) || this.buildNestedUrl(model.getName(), parent);
+    }
+
+    getFindAllRoute (Model) {
+        return this.getOverrideRoute('findAll', new Model()) || this.getUrl(new Model().getName());
+    }
+
+    getFindAllWithinRoute (Model, parent) {
+        const overrideModel = new Model();
+        overrideModel.getParent = () => {
+            return parent;
+        };
+
+        return this.getOverrideRoute('findAll', overrideModel) || this.buildNestedUrl(new Model().getName(), parent);
+    }
+
+    getUpdateRoute (model) {
+        return this.getOverrideRoute('update', model) || this.getSingleFetchUrl(model);
     }
 
     getUrl (url) {
@@ -227,7 +255,7 @@ class RestAdapter {
     }
 
     update (model, options = {}) {
-        const url = this.getOverrideRoute('update', model) || this.getSingleFetchUrl(model);
+        const url = this.getUpdateRoute(model);
         const requestOptions = this.createOptions(options);
         requestOptions.body = this.getBody(model);
 
