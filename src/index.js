@@ -74,14 +74,14 @@ class RestAdapter {
             .then(this.formatFetchResponse.bind(this));
     }
 
-    createOptions (options = {}) {
+    createOptions (model, options = {}) {
         options.headers = Object.assign({}, this[adapterOptions].headers, options.headers);
 
         return Object.assign({}, this[adapterOptions], options);
     }
 
-    createOptionsWithEtags (url, options) {
-        let requestOptions = this.createOptions(options);
+    createOptionsWithEtags (model, url, options) {
+        let requestOptions = this.createOptions(model, options);
         let key = `${url}-${JSON.stringify(requestOptions.body)}`;
 
         requestOptions.headers['If-None-Match'] = storage[`e-${key}`];
@@ -91,7 +91,7 @@ class RestAdapter {
 
     destroy (model, options) {
         const url = this.getDestroyRoute(model);
-        const requestOptions = this.createOptions(options);
+        const requestOptions = this.createOptions(model, options);
         requestOptions.body = model.toJSON();
 
         return ajax('DELETE', url, requestOptions)
@@ -100,7 +100,7 @@ class RestAdapter {
 
     fetch (model, options = {}) {
         const url = this.getFetchRoute(model);
-        const requestOptions = this.createOptionsWithEtags(url, options);
+        const requestOptions = this.createOptionsWithEtags(model, url, options);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
             return endpointResolver[url];
@@ -120,7 +120,7 @@ class RestAdapter {
 
     fetchWithin (model, parent, options = {}) {
         const url = this.getFetchWithinRoute(model, parent);
-        const requestOptions = this.createOptionsWithEtags(url, options);
+        const requestOptions = this.createOptionsWithEtags(model, url, options);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
             return endpointResolver[url];
@@ -140,7 +140,7 @@ class RestAdapter {
 
     findAll (Model, options = {}) {
         const url = this.getFindAllRoute(Model);
-        const requestOptions = this.createOptionsWithEtags(url, options);
+        const requestOptions = this.createOptionsWithEtags(null, url, options);
 
         return ajax('GET', url, requestOptions)
             .then(this.formatFindAllResponse.bind(this));
@@ -148,7 +148,7 @@ class RestAdapter {
 
     findAllWithin (Model, parent, options = {}) {
         const url = this.getFindAllWithinRoute(Model, parent);
-        const requestOptions = this.createOptionsWithEtags(url, options);
+        const requestOptions = this.createOptionsWithEtags(parent, url, options);
 
         return ajax('GET', this.getUrl(url), requestOptions)
             .then(this.formatFindAllResponse.bind(this));
@@ -256,7 +256,7 @@ class RestAdapter {
 
     update (model, options = {}) {
         const url = this.getUpdateRoute(model);
-        const requestOptions = this.createOptions(options);
+        const requestOptions = this.createOptions(model, options);
         requestOptions.body = this.getBody(model);
 
         return ajax('PUT', url, requestOptions)
