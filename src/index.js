@@ -5,7 +5,7 @@ const adapterOptions = Symbol();
 
 let endpointState = {};
 let endpointResolver = {};
-let storage = global.localStorage || {};
+let storage = global.sessionStorage || {};
 
 class RestAdapter {
 
