@@ -11,13 +11,13 @@ describe('fetch()', () => {
 
     it('Should allow us to define a custom url path', (done) => {
         const car = new Car(1);
-        const adapter = new RestAdapter();
-
-        adapter.fetch(car, {
-            getPath: () => {
-                return 'foo/bar/baz';
+        const adapter = new RestAdapter(car, {
+            Car: {
+                fetch: 'foo/bar/baz'
             }
-        }).then((data) => {
+        });
+
+        adapter.fetch(car).then((data) => {
             assert.equal(data.make, 'Foo');
             done();
         });
@@ -27,7 +27,7 @@ describe('fetch()', () => {
         const car = new Car(1);
         const adapter = new RestAdapter();
 
-        adapter.fetch(car).then((data) => {
+        adapter.fetch(car, {}).then((data) => {
             assert.equal(data.make, 'Ford');
             done();
         });
@@ -65,40 +65,6 @@ describe('fetch()', () => {
             assert.equal(data.make, 'Jeep');
             done();
         });
-    });
-
-    it('Should pass headers included in the adapter config', (done) => {
-        const car = new Car(1);
-        const adapter = new RestAdapter({
-            headers: {
-                everything: 'awesome'
-            }
-        });
-
-        adapter.formatFetchResponse = (response) => {
-            assert.equal(response.headers.everything, 'awesome');
-            done();
-        };
-
-        adapter.fetch(car);
-
-    });
-
-    it('Should pass headers included in the request options', (done) => {
-        const car = new Car(1);
-        const adapter = new RestAdapter();
-
-        adapter.formatFetchResponse = (response) => {
-            assert.equal(response.headers.everything, 'awesome');
-            done();
-        };
-
-        adapter.fetch(car, {
-            headers: {
-                everything: 'awesome'
-            }
-        });
-
     });
 
 });

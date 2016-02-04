@@ -8,19 +8,19 @@ const responses = {
                 name: 'Foo'
             }
         },
-        'api/cars/3/part': {
+        'api/cars/3/parts': {
             body: {
                 id: 3,
                 name: 'Engine'
             }
         },
-        'cars/1/part': {
+        'cars/1/parts': {
             body: {
                 id: 1,
                 name: 'Steering Wheel'
             }
         },
-        'cars/2/part': {
+        'cars/2/parts': {
             body: {
                 part: {
                     id: 2,

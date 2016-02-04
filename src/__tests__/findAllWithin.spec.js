@@ -11,18 +11,18 @@ const RestAdapter = proxyquire('../index', {
 describe('findAllWithin()', () => {
 
     it('Should allow us to define our own url path', (done) => {
-        const adapter = new RestAdapter();
+        const adapter = new RestAdapter({}, {
+            'Car/Part': {
+                findAll: 'foo/bar/baz'
+            }
+        });
         const car = new Car(1);
 
         Part.prototype.getParent = () => {
             return car;
         };
 
-        adapter.findAllWithin(Part, car, {
-            getPath: () => {
-                return 'foo/bar/baz';
-            }
-        }).then((data) => {
+        adapter.findAllWithin(Part, car).then((data) => {
             assert.equal(data[0].id, 100);
             done();
         });
