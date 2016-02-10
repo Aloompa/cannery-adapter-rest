@@ -84,17 +84,20 @@ class RestAdapter {
 
     create (model, options) {
         const url = this.getCreateRoute(model);
-        const requestOptions = this.createOptions(options);
+        const requestOptions = this.createOptions(model, options);
         requestOptions.body = this.getBody(model);
 
         return ajax('POST', url, requestOptions)
             .then(this.formatFetchResponse.bind(this));
     }
 
-    createOptions (model, options = {}) {
-        options.headers = Object.assign({}, this[adapterOptions].headers, options.headers);
-
-        return Object.assign({}, this[adapterOptions], options);
+    createOptions (model, options) {
+        options = options || {};
+        return Object.assign({}, {
+            qs: options.qs,
+            body: options.body,
+            headers: Object.assign({}, this[adapterOptions].headers, options.headers)
+        });
     }
 
     createOptionsWithEtags (model, options, cacheKey) {
