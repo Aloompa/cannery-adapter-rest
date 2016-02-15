@@ -1,6 +1,7 @@
 'use strict';
 
 const ajax = require('then-request');
+const debug = require('debug')('cannery-adapter-rest');
 const adapterOptions = Symbol();
 
 let endpointState = {};
@@ -12,6 +13,20 @@ class RestAdapter {
     constructor (options = {}, routes = {}) {
         this.routes = routes;
         this[adapterOptions] = options;
+    }
+
+    buildCacheKey (url, options = {}) {
+        let key = this.getUrl(url);
+
+        if (options.qs) {
+            key += `-${JSON.stringify(options.qs)}`;
+        }
+
+        if (options.headers) {
+            key += `-${JSON.stringify(options.headers)}`;
+        }
+
+        return key;
     }
 
     getRoutePath (model) {
@@ -47,6 +62,8 @@ class RestAdapter {
     getOverrideRoute (requestType, model) {
         const path = this.getRoutePath(model);
 
+        debug('ROUTE', requestType, path);
+
         if (this.routes[path] && this.routes[path][requestType]) {
             return this.parseOverrideRoute(this.routes[path][requestType], model);
         }
@@ -67,24 +84,26 @@ class RestAdapter {
 
     create (model, options) {
         const url = this.getCreateRoute(model);
-        const requestOptions = this.createOptions(options);
+        const requestOptions = this.createOptions(model, options);
         requestOptions.body = this.getBody(model);
 
         return ajax('POST', url, requestOptions)
             .then(this.formatFetchResponse.bind(this));
     }
 
-    createOptions (model, options = {}) {
-        options.headers = Object.assign({}, this[adapterOptions].headers, options.headers);
-
-        return Object.assign({}, this[adapterOptions], options);
+    createOptions (model, options) {
+        options = options || {};
+        return Object.assign({}, {
+            qs: options.qs,
+            body: options.body,
+            headers: Object.assign({}, this[adapterOptions].headers, options.headers)
+        });
     }
 
-    createOptionsWithEtags (model, url, options) {
+    createOptionsWithEtags (model, options, cacheKey) {
         let requestOptions = this.createOptions(model, options);
-        let key = `${url}-${JSON.stringify(requestOptions.body)}`;
 
-        requestOptions.headers['If-None-Match'] = storage[`e-${key}`];
+        //requestOptions.headers['If-None-Match'] = storage[`cannery-e-${cacheKey}`];
 
         return requestOptions;
     }
@@ -100,7 +119,8 @@ class RestAdapter {
 
     fetch (model, options = {}) {
         const url = this.getFetchRoute(model);
-        const requestOptions = this.createOptionsWithEtags(model, url, options);
+        const cacheKey = this.buildCacheKey(url, options);
+        const requestOptions = this.createOptionsWithEtags(model, options, cacheKey);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
             return endpointResolver[url];
@@ -109,7 +129,9 @@ class RestAdapter {
         endpointState[url] = 'fetching';
 
         endpointResolver[url] = ajax('GET', url, requestOptions)
-            .then(this.formatFetchResponse.bind(this))
+            .then((response) => {
+                return this.formatFetchResponse(response, cacheKey);
+            })
             .then((response) => {
                 endpointState[url] = 'fetched';
                 return response;
@@ -120,7 +142,8 @@ class RestAdapter {
 
     fetchWithin (model, parent, options = {}) {
         const url = this.getFetchWithinRoute(model, parent);
-        const requestOptions = this.createOptionsWithEtags(model, url, options);
+        const cacheKey = this.buildCacheKey(url, options);
+        const requestOptions = this.createOptionsWithEtags(model, options, cacheKey);
 
         if (endpointState[url] === 'fetching' || endpointState[url] === 'fetched') {
             return endpointResolver[url];
@@ -129,7 +152,9 @@ class RestAdapter {
         endpointState[url] = 'fetching';
 
         endpointResolver[url] = ajax('GET', this.getUrl(url), requestOptions)
-            .then(this.formatFetchResponse.bind(this))
+            .then((response) => {
+                return this.formatFetchResponse(response, cacheKey);
+            })
             .then((response) => {
                 endpointState[url] = 'fetched';
                 return response;
@@ -140,29 +165,35 @@ class RestAdapter {
 
     findAll (Model, options = {}) {
         const url = this.getFindAllRoute(Model);
-        const requestOptions = this.createOptionsWithEtags(null, url, options);
+        const cacheKey = this.buildCacheKey(url, options);
+        const requestOptions = this.createOptionsWithEtags(null, options, cacheKey);
 
         return ajax('GET', url, requestOptions)
-            .then(this.formatFindAllResponse.bind(this));
+            .then((response) => {
+                return this.formatFindAllResponse(response, cacheKey);
+            });
     }
 
     findAllWithin (Model, parent, options = {}) {
         const url = this.getFindAllWithinRoute(Model, parent);
-        const requestOptions = this.createOptionsWithEtags(parent, url, options);
+        const cacheKey = this.buildCacheKey(url, options);
+        const requestOptions = this.createOptionsWithEtags(parent, options, cacheKey);
 
         return ajax('GET', this.getUrl(url), requestOptions)
-            .then(this.formatFindAllResponse.bind(this));
+            .then((response) => {
+                return this.formatFindAllResponse(response, cacheKey);
+            });
     }
 
-    formatFetchResponse (response) {
-        const body = this.parseResponse(response);
+    formatFetchResponse (response, cacheKey) {
+        const body = this.parseResponse(response, cacheKey);
         const envelope = this.getOptions().envelope;
 
         return (envelope) ? body[envelope] : body;
     }
 
-    formatFindAllResponse (response) {
-        const body = this.parseResponse(response);
+    formatFindAllResponse (response, cacheKey) {
+        const body = this.parseResponse(response, cacheKey);
         const envelope = this.getOptions().arrayEnvelope;
 
         return (envelope) ? body[envelope] : body;
@@ -229,28 +260,29 @@ class RestAdapter {
         return this[adapterOptions];
     }
 
-    getResponseBody (response) {
-        const key = response.url;
-        const cachedDate = storage[`cannery-d-${key}`];
+    getResponseBody (response, cacheKey) {
+        const cachedData = storage[`cannery-d-${cacheKey}`];
 
-        if (response.statusCode === 304 && cachedDate) {
-            return cachedDate;
+        if (response.statusCode === 304 && cachedData) {
+            return cachedData;
         }
 
         if (response.headers.etag) {
-            storage[`cannery-e-${key}`] = response.headers.etag;
-            storage[`cannery-d-${key}`] = response.getBody();
+            storage[`cannery-e-${cacheKey}`] = response.headers.etag;
+            storage[`cannery-d-${cacheKey}`] = response.getBody();
         }
 
         return response.getBody();
     }
 
-    parseResponse (response) {
-        const body = this.getResponseBody(response);
+    parseResponse (response, cacheKey) {
+        const body = this.getResponseBody(response, cacheKey);
 
         try {
             return JSON.parse(body);
-        } catch (e) {}
+        } catch (e) {
+            return {};
+        }
 
     }
 
