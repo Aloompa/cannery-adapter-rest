@@ -103,7 +103,7 @@ class RestAdapter {
     createOptionsWithEtags (model, options, cacheKey) {
         let requestOptions = this.createOptions(model, options);
 
-        requestOptions.headers['If-None-Match'] = storage[`cannery-e-${cacheKey}`];
+        //requestOptions.headers['If-None-Match'] = storage[`cannery-e-${cacheKey}`];
 
         return requestOptions;
     }
@@ -281,7 +281,7 @@ class RestAdapter {
         try {
             return JSON.parse(body);
         } catch (e) {
-            throw new Error('JSON PARSE ERROR', e);
+            return {};
         }
 
     }
