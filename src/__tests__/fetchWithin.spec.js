@@ -11,18 +11,18 @@ const RestAdapter = proxyquire('../index', {
 describe('fetchWithin()', () => {
 
     it('Should let us define our own url path', (done) => {
-        const adapter = new RestAdapter();
         const car = new Car(1);
+        const adapter = new RestAdapter(car, {
+            'Car/Part': {
+                fetch: 'foo/bar/baz'
+            }
+        });
 
         Part.prototype.getParent = () => {
             return car;
         };
 
-        adapter.fetchWithin(new Part(), car, {
-            getPath: () => {
-                return 'foo/bar/baz';
-            }
-        }).then((data) => {
+        adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Foo');
             done();
         });
@@ -63,7 +63,7 @@ describe('fetchWithin()', () => {
         const car = new Car(2000);
         const adapter = new RestAdapter();
 
-        adapter.fetchWithin(new Part(), car).catch((data) => {
+        adapter.fetchWithin(new Part(), car, {}).catch((data) => {
             assert.equal(data.statusCode, 404);
             done();
         });
@@ -77,6 +77,18 @@ describe('fetchWithin()', () => {
 
         adapter.fetchWithin(new Part(), car).then((data) => {
             assert.equal(data.name, 'Engine');
+            done();
+        });
+    });
+
+    it('Should not make 2 requests if for the same endpoint at the same time', (done) => {
+        const car = new Car(3);
+        const adapter = new RestAdapter({
+            urlRoot: 'api/'
+        });
+
+        adapter.fetchWithin(new Part(), car);
+        adapter.fetchWithin(new Part(), car).then(() => {
             done();
         });
     });

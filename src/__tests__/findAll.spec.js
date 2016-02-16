@@ -10,13 +10,13 @@ const RestAdapter = proxyquire('../index', {
 describe('findAll()', () => {
 
     it('Should let us use our own url path', (done) => {
-        const adapter = new RestAdapter();
-
-        adapter.findAll(Car, {
-            getPath: () => {
-                return 'foo/bar/baz';
+        const adapter = new RestAdapter({}, {
+            Car: {
+                findAll: 'foo/bar/baz'
             }
-        }).then((data) => {
+        });
+
+        adapter.findAll(Car).then((data) => {
             assert.equal(data[0].id, 100);
             done();
         });

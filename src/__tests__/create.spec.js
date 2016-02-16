@@ -9,8 +9,22 @@ const RestAdapter = proxyquire('../index', {
 
 describe('create()', () => {
 
-    it('Should respond with an object of data', (done) => {
+    it('Should allow us to override the route', (done) => {
         const car = new Car(1);
+        const adapter = new RestAdapter(car, {
+            Car: {
+                create: 'foo/bar/baz'
+            }
+        });
+
+        adapter.create(car).then((data) => {
+            assert.equal(data.id, 5000);
+            done();
+        });
+    });
+
+    it('Should respond with an object of data', (done) => {
+        const car = new Car();
         const adapter = new RestAdapter();
 
         adapter.create(car).then((data) => {
@@ -20,7 +34,7 @@ describe('create()', () => {
     });
 
     it('Should allow us to pass in an envelope for our data', (done) => {
-        const car = new Car(2);
+        const car = new Car();
         const adapter = new RestAdapter({
             envelope: 'car'
         });
@@ -32,7 +46,7 @@ describe('create()', () => {
     });
 
     it('Should catch errors', (done) => {
-        const car = new Car(3);
+        const car = new Car();
         const adapter = new RestAdapter({
             throwError: true
         });
@@ -44,13 +58,13 @@ describe('create()', () => {
     });
 
     it('Should allow us to specify a urlRoot', (done) => {
-        const car = new Car(4);
+        const car = new Car();
         const adapter = new RestAdapter({
             urlRoot: 'api/'
         });
 
         adapter.create(car).then((data) => {
-            assert.equal(data.id, 4);
+            assert.equal(data.id, 3);
             done();
         });
     });
